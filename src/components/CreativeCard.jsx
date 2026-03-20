@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Download, Eye, X, Loader2, FileText } from 'lucide-react';
 
 export default function CreativeCard({ item, type }) {
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({ name: '', arn: '', phone: '' });
   const [isGenerating, setIsGenerating] = useState(false);
+  
+  useEffect(() => {
+    if (showModal) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+    return () => document.body.classList.remove('modal-open');
+  }, [showModal]);
 
   const handleDownloadClick = () => {
     if (item.id === 'wa-1') {
