@@ -1,0 +1,9 @@
+# Dependencies
+node_modules/
+
+# Local environment variables containing credentials
+.env
+
+# Log files
+*.log
+err.log
