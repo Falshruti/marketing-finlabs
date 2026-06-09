@@ -1,0 +1,2673 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zoho CRM — Lead Dashboard</title>
+  <meta name="description"
+    content="Real-time Zoho CRM Lead Dashboard with analytics, KPIs, charts and searchable lead table." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════════════
+       DESIGN TOKENS
+    ═══════════════════════════════════════════════════════════════════ */
+    :root {
+      --bg-base: #080f1a;
+      --bg-surface: #0d1b2a;
+      --bg-card: #111d2e;
+      --bg-card-hover: #162338;
+      --bg-glass: rgba(255, 255, 255, 0.04);
+
+      --accent-blue: #00b4d8;
+      --accent-cyan: #48cae4;
+      --accent-purple: #7b2d8b;
+      --accent-violet: #a855f7;
+      --accent-green: #22c55e;
+      --accent-orange: #f97316;
+      --accent-red: #ef4444;
+      --accent-yellow: #eab308;
+
+      --text-primary: #f0f6ff;
+      --text-secondary: #94a3b8;
+      --text-muted: #4e6072;
+
+      --border: rgba(255, 255, 255, 0.07);
+      --border-accent: rgba(0, 180, 216, 0.3);
+
+      --gradient-hero: linear-gradient(135deg, #0d1b2a 0%, #071226 40%, #1a0a2e 100%);
+      --gradient-blue: linear-gradient(135deg, #00b4d8, #0077b6);
+      --gradient-purple: linear-gradient(135deg, #7b2d8b, #a855f7);
+      --gradient-green: linear-gradient(135deg, #22c55e, #16a34a);
+      --gradient-orange: linear-gradient(135deg, #f97316, #ea580c);
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+      --radius-xl: 28px;
+
+      --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.2);
+      --shadow-glow: 0 0 40px rgba(0, 180, 216, 0.15);
+      --shadow-hover: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 180, 216, 0.1);
+
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       RESET & BASE
+    ═══════════════════════════════════════════════════════════════════ */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated background mesh */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(0, 180, 216, 0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 60% at 80% 80%, rgba(123, 45, 139, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(0, 119, 182, 0.03) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       HEADER / NAV
+    ═══════════════════════════════════════════════════════════════════ */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(8, 15, 26, 0.85);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+    }
+
+    .header-inner {
+      max-width: 1600px;
+      margin: 0 auto;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 38px;
+      height: 38px;
+      background: var(--gradient-blue);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 0 20px rgba(0, 180, 216, 0.3);
+      flex-shrink: 0;
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+
+    .logo-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--accent-green);
+      cursor: default;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--accent-green);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.5;
+        transform: scale(0.8);
+      }
+    }
+
+    #last-updated {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: var(--gradient-blue);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(0, 180, 216, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(0, 180, 216, 0.4);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: var(--bg-glass);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-primary);
+      border-color: var(--border-accent);
+    }
+
+    .btn-icon {
+      font-size: 15px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       HERO SECTION
+    ═══════════════════════════════════════════════════════════════════ */
+    .hero {
+      position: relative;
+      padding: 48px 28px 0;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    .hero h1 {
+      font-size: clamp(26px, 3vw, 36px);
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      line-height: 1.2;
+      background: linear-gradient(135deg, #f0f6ff 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-violet));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      font-weight: 400;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       MAIN LAYOUT
+    ═══════════════════════════════════════════════════════════════════ */
+    .main {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 32px 28px 60px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       KPI CARDS
+    ═══════════════════════════════════════════════════════════════════ */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+      transition: var(--transition);
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--card-accent, var(--gradient-blue));
+      border-radius: 2px 2px 0 0;
+    }
+
+    .kpi-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-accent);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .kpi-card.blue {
+      --card-accent: var(--gradient-blue);
+    }
+
+    .kpi-card.purple {
+      --card-accent: var(--gradient-purple);
+    }
+
+    .kpi-card.green {
+      --card-accent: var(--gradient-green);
+    }
+
+    .kpi-card.orange {
+      --card-accent: var(--gradient-orange);
+    }
+
+    .kpi-card.yellow {
+      --card-accent: linear-gradient(135deg, #eab308, #ca8a04);
+    }
+
+    .kpi-card.red {
+      --card-accent: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+
+    .kpi-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+    }
+
+    .kpi-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      background: var(--card-accent);
+      opacity: 0.9;
+    }
+
+    .kpi-value {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1;
+      color: var(--text-primary);
+      transition: var(--transition);
+    }
+
+    .kpi-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .kpi-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    .kpi-badge.up {
+      background: rgba(34, 197, 94, 0.12);
+      color: #22c55e;
+    }
+
+    .kpi-badge.down {
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444;
+    }
+
+    .kpi-badge.neutral {
+      background: rgba(148, 163, 184, 0.1);
+      color: var(--text-muted);
+    }
+
+    .kpi-meta-text {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       CHARTS GRID
+    ═══════════════════════════════════════════════════════════════════ */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      transition: var(--transition);
+    }
+
+    .chart-card:hover {
+      border-color: var(--border-accent);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .chart-card.wide {
+      grid-column: span 1;
+    }
+
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .chart-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .chart-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .chart-badge {
+      background: var(--bg-glass);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .chart-container {
+      position: relative;
+    }
+
+    .chart-container canvas {
+      max-height: 260px;
+    }
+
+    /* Second row charts */
+    .charts-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       LEADS TABLE
+    ═══════════════════════════════════════════════════════════════════ */
+    .table-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .table-header {
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .table-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .table-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .table-count {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .table-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .search-input-wrap {
+      position: relative;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    #search-input {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px 8px 36px;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: inherit;
+      width: 240px;
+      transition: var(--transition);
+      outline: none;
+    }
+
+    #search-input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.1);
+    }
+
+    #search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .filter-select {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 32px 8px 12px;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      transition: var(--transition);
+    }
+
+    .filter-select:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead {
+      background: var(--bg-surface);
+      position: sticky;
+      top: 0;
+    }
+
+    thead th {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+      transition: var(--transition);
+    }
+
+    thead th:hover {
+      color: var(--text-primary);
+    }
+
+    thead th .sort-icon {
+      display: inline-block;
+      margin-left: 4px;
+      opacity: 0.4;
+      font-size: 10px;
+    }
+
+    thead th.sort-active .sort-icon {
+      opacity: 1;
+      color: var(--accent-blue);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: var(--transition);
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    tbody td {
+      padding: 13px 16px;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    .lead-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .lead-name-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .lead-name {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 13px;
+    }
+
+    .lead-company {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    .lead-email {
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .status-dot-sm {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Status colors */
+    .status-new {
+      background: rgba(0, 180, 216, 0.12);
+      color: #00b4d8;
+    }
+
+    .status-new .status-dot-sm {
+      background: #00b4d8;
+    }
+
+    .status-contacted {
+      background: rgba(168, 85, 247, 0.12);
+      color: #a855f7;
+    }
+
+    .status-contacted .status-dot-sm {
+      background: #a855f7;
+    }
+
+    .status-converted {
+      background: rgba(34, 197, 94, 0.12);
+      color: #22c55e;
+    }
+
+    .status-converted .status-dot-sm {
+      background: #22c55e;
+    }
+
+    .status-dead {
+      background: rgba(239, 68, 68, 0.1);
+      color: #f87171;
+    }
+
+    .status-dead .status-dot-sm {
+      background: #f87171;
+    }
+
+    .status-default {
+      background: rgba(148, 163, 184, 0.1);
+      color: #94a3b8;
+    }
+
+    .status-default .status-dot-sm {
+      background: #94a3b8;
+    }
+
+    .rating-hot {
+      color: #f97316;
+      font-weight: 700;
+    }
+
+    .rating-warm {
+      color: #eab308;
+      font-weight: 700;
+    }
+
+    .rating-cold {
+      color: #60a5fa;
+      font-weight: 700;
+    }
+
+    .source-tag {
+      display: inline-flex;
+      padding: 3px 8px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       PAGINATION
+    ═══════════════════════════════════════════════════════════════════ */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .pagination-info {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .page-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+
+    .page-btn:hover:not(:disabled) {
+      background: var(--bg-card-hover);
+      color: var(--text-primary);
+      border-color: var(--border-accent);
+    }
+
+    .page-btn.active {
+      background: var(--gradient-blue);
+      border-color: transparent;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .page-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       LOADING & ERROR STATES
+    ═══════════════════════════════════════════════════════════════════ */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 15, 26, 0.9);
+      backdrop-filter: blur(8px);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      transition: opacity 0.4s;
+    }
+
+    .loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .spinner {
+      width: 52px;
+      height: 52px;
+      border: 3px solid rgba(0, 180, 216, 0.15);
+      border-top-color: var(--accent-blue);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading-text {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .loading-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .error-toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: var(--radius-md);
+      padding: 14px 20px;
+      font-size: 13px;
+      color: #f87171;
+      max-width: 360px;
+      z-index: 998;
+      display: none;
+      backdrop-filter: blur(16px);
+      animation: slideIn 0.3s ease;
+    }
+
+    .error-toast.show {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       EMPTY STATE
+    ═══════════════════════════════════════════════════════════════════ */
+    .empty-state {
+      padding: 60px;
+      text-align: center;
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.4;
+    }
+
+    .empty-text {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .empty-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       LEGEND CUSTOM
+    ═══════════════════════════════════════════════════════════════════ */
+    .custom-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .legend-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       SETUP NOTICE
+    ═══════════════════════════════════════════════════════════════════ */
+    .setup-notice {
+      background: rgba(0, 180, 216, 0.05);
+      border: 1px solid rgba(0, 180, 216, 0.2);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 28px;
+      display: none;
+    }
+
+    .setup-notice.show {
+      display: block;
+    }
+
+    .setup-notice-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--accent-blue);
+      margin-bottom: 8px;
+    }
+
+    .setup-notice code {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      color: var(--accent-cyan);
+    }
+
+    .setup-steps {
+      list-style: none;
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .setup-steps li {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .step-num {
+      background: var(--gradient-blue);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════════════════════════ */
+    @media (max-width: 1200px) {
+
+      .charts-grid,
+      .charts-grid-2 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 0 16px;
+      }
+
+      .main {
+        padding: 24px 16px 48px;
+      }
+
+      .hero {
+        padding: 32px 16px 0;
+      }
+
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .charts-grid,
+      .charts-grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      #search-input {
+        width: 180px;
+      }
+
+      .status-badge span {
+        display: none;
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       ANIMATIONS
+    ═══════════════════════════════════════════════════════════════════ */
+    .fade-in {
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .kpi-card {
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    .kpi-card:nth-child(1) {
+      animation-delay: 0.05s;
+    }
+
+    .kpi-card:nth-child(2) {
+      animation-delay: 0.10s;
+    }
+
+    .kpi-card:nth-child(3) {
+      animation-delay: 0.15s;
+    }
+
+    .kpi-card:nth-child(4) {
+      animation-delay: 0.20s;
+    }
+
+    .kpi-card:nth-child(5) {
+      animation-delay: 0.25s;
+    }
+
+    .kpi-card:nth-child(6) {
+      animation-delay: 0.30s;
+    }
+
+    .filter-bar-container {
+      max-width: 1600px;
+      margin: 24px auto 0;
+      padding: 0 28px;
+    }
+
+    .filter-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .filter-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .filter-date-input {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .filter-date-input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.1);
+    }
+
+    /* Lead Funnel Styles */
+    .funnel-container {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: 100%;
+      height: 240px;
+      margin-top: 10px;
+    }
+
+    .funnel-stage {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-color);
+      clip-path: polygon(calc(50% - var(--width-top) / 2) 0%,
+          calc(50% + var(--width-top) / 2) 0%,
+          calc(50% + var(--width-bottom) / 2) 100%,
+          calc(50% - var(--width-bottom) / 2) 100%);
+      transition: all 0.3s ease;
+      cursor: default;
+    }
+
+    .funnel-stage:hover {
+      filter: brightness(1.15);
+      transform: scale(1.01);
+    }
+
+    .funnel-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #ffffff;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading Dashboard...</div>
+    <div class="loading-sub" id="loading-sub-text">Connecting to Zoho CRM API</div>
+  </div>
+
+  <!-- Error Toast -->
+  <div class="error-toast" id="error-toast">
+    <span>⚠️</span>
+    <span id="error-message"></span>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       HEADER
+  ════════════════════════════════════════════ -->
+  <header class="header">
+    <div class="header-inner">
+      <a class="logo" href="#" aria-label="Lead Dashboard Home">
+        <div class="logo-icon">📊</div>
+        <div class="logo-text">
+          <span class="logo-title">Lead Dashboard</span>
+          <span class="logo-subtitle">Zoho CRM Analytics</span>
+        </div>
+      </a>
+      <div class="header-right">
+        <div class="status-badge">
+          <span class="status-dot"></span>
+          <span>Live</span>
+        </div>
+        <span id="last-updated">—</span>
+        <button class="btn btn-secondary" id="export-btn" title="Export to CSV">
+          <span class="btn-icon">⬇️</span> Export
+        </button>
+        <button class="btn btn-primary" id="refresh-btn" title="Refresh data">
+          <span class="btn-icon">🔄</span> Refresh
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ════════════════════════════════════════════
+       HERO
+  ════════════════════════════════════════════ -->
+  <section class="hero">
+    <h1>Lead <span>Intelligence</span> Dashboard</h1>
+    <p class="hero-sub">Real-time analytics from your Zoho CRM — Updated automatically</p>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       DASHBOARD FILTER BAR
+  ════════════════════════════════════════════ -->
+  <div class="filter-bar-container">
+    <div class="filter-bar">
+      <div class="filter-group">
+        <span class="filter-label">Filter Date Range:</span>
+      </div>
+      <div class="filter-group">
+        <label for="start-date" class="filter-label">From</label>
+        <input type="date" id="start-date" class="filter-date-input" />
+      </div>
+      <div class="filter-group">
+        <label for="end-date" class="filter-label">To</label>
+        <input type="date" id="end-date" class="filter-date-input" />
+      </div>
+      <button class="btn btn-secondary" id="clear-dates-btn" style="padding: 7px 14px; font-size: 12px;">Clear
+        Dates</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       MAIN CONTENT
+  ════════════════════════════════════════════ -->
+  <main class="main">
+
+    <!-- Setup Notice (shown if API fails) -->
+    <div class="setup-notice" id="setup-notice">
+      <div class="setup-notice-title">⚙️ Setup Required — Connect to Zoho CRM</div>
+      <p style="font-size:13px;color:var(--text-secondary)">
+        The dashboard is running but needs your Zoho credentials. Follow these steps:
+      </p>
+      <ol class="setup-steps">
+        <li><span class="step-num">1</span> Go to <strong>api-console.zoho.in</strong> → Create a Server-based app →
+          Copy Client ID & Secret</li>
+        <li><span class="step-num">2</span> Edit <code>.env</code> file → Set <code>ZOHO_CLIENT_ID</code> and
+          <code>ZOHO_CLIENT_SECRET</code>
+        </li>
+        <li><span class="step-num">3</span> Run <code>npm run auth</code> in terminal → Authorize in browser → Copy
+          <code>ZOHO_REFRESH_TOKEN</code> to <code>.env</code>
+        </li>
+        <li><span class="step-num">4</span> Restart with <code>npm start</code> → Dashboard auto-loads your leads data
+        </li>
+      </ol>
+    </div>
+
+    <!-- KPI Cards -->
+    <p class="section-title">Key Performance Indicators</p>
+    <div class="kpi-grid" id="kpi-grid">
+      <div class="kpi-card blue">
+        <div class="kpi-header">
+          <span class="kpi-label">Total Leads</span>
+          <div class="kpi-icon">👥</div>
+        </div>
+        <div class="kpi-value" id="kpi-total">—</div>
+        <div class="kpi-meta">
+          <span class="kpi-badge neutral">Leads + Trial + Subscribed</span>
+        </div>
+      </div>
+
+      <div class="kpi-card green">
+        <div class="kpi-header">
+          <span class="kpi-label">New Leads</span>
+          <div class="kpi-icon">📅</div>
+        </div>
+        <div class="kpi-value" id="kpi-this-month">—</div>
+        <div class="kpi-meta">
+          <span class="kpi-badge neutral" id="kpi-growth-badge">—</span>
+          <span class="kpi-meta-text">vs last month</span>
+        </div>
+      </div>
+
+      <div class="kpi-card purple">
+        <div class="kpi-header">
+          <span class="kpi-label">Conversion Rate</span>
+          <div class="kpi-icon">✅</div>
+        </div>
+        <div class="kpi-value" id="kpi-converted">—</div>
+        <div class="kpi-meta">
+          <span class="kpi-badge neutral" id="kpi-conv-rate">—</span>
+          <span class="kpi-meta-text">from total leads to subscribed</span>
+        </div>
+      </div>
+
+      <div class="kpi-card orange">
+        <div class="kpi-header">
+          <span class="kpi-label">Subscribed</span>
+          <div class="kpi-icon">💼</div>
+        </div>
+        <div class="kpi-value" id="kpi-accounts">—</div>
+        <div class="kpi-meta">
+          <span class="kpi-badge neutral">Subscribed Count</span>
+        </div>
+      </div>
+
+      <div class="kpi-card yellow">
+        <div class="kpi-header">
+          <span class="kpi-label">Trial</span>
+          <div class="kpi-icon">📇</div>
+        </div>
+        <div class="kpi-value" id="kpi-contacts">—</div>
+        <div class="kpi-meta">
+          <span class="kpi-badge neutral">Trial Count</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <p class="section-title">Analytics Overview</p>
+    <div class="charts-grid" id="charts-row-1">
+
+      <!-- Lead Source Bar Chart (all sources) -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Lead Sources</div>
+            <div class="chart-subtitle">All sources — including 0 count</div>
+          </div>
+          <div class="chart-badge" id="source-total-badge">—</div>
+        </div>
+        <div class="chart-container" style="height:auto;">
+          <canvas id="sourceChart"></canvas>
+        </div>
+        <div class="custom-legend" id="source-legend"
+          style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;margin-top:10px;"></div>
+      </div>
+
+      <!-- Lead Status Bar Chart -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Lead Status</div>
+            <div class="chart-subtitle">Distribution by pipeline stage</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="statusChart" height="240"></canvas>
+        </div>
+      </div>
+
+      <!-- Lead Status Funnel Chart -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Lead Funnel</div>
+            <div class="chart-subtitle">Conversion pipeline stages</div>
+          </div>
+        </div>
+        <div class="funnel-container">
+          <div class="funnel-stage stage-1" style="--width-top: 100%; --width-bottom: 90%; --bg-color: #0f8b8d;">
+            <span class="funnel-label" id="funnel-stage-1">Total Leads: 0</span>
+          </div>
+          <div class="funnel-stage stage-2" style="--width-top: 89%; --width-bottom: 79%; --bg-color: #14999c;">
+            <span class="funnel-label" id="funnel-stage-2">Connected: 0</span>
+          </div>
+          <div class="funnel-stage stage-3" style="--width-top: 78%; --width-bottom: 68%; --bg-color: #1baba9;">
+            <span class="funnel-label" id="funnel-stage-3">Demo Scheduled: 0</span>
+          </div>
+          <div class="funnel-stage stage-4" style="--width-top: 67%; --width-bottom: 57%; --bg-color: #2bbbb9;">
+            <span class="funnel-label" id="funnel-stage-4">Demo Conducted: 0</span>
+          </div>
+          <div class="funnel-stage stage-5" style="--width-top: 56%; --width-bottom: 46%; --bg-color: #5bc8c6;">
+            <span class="funnel-label" id="funnel-stage-5">Trial: 0</span>
+          </div>
+          <div class="funnel-stage stage-6" style="--width-top: 45%; --width-bottom: 35%; --bg-color: #8cd6d4;">
+            <span class="funnel-label" id="funnel-stage-6">Subscribed: 0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="charts-grid-2">
+      <!-- Monthly Trend Line Chart -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Lead Volume Trend</div>
+            <div class="chart-subtitle">Last 12 months</div>
+          </div>
+          <div class="chart-badge" id="trend-badge">12 months</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="trendChart" height="220"></canvas>
+        </div>
+      </div>
+
+      <!-- ARN Breakdown -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">ARN Breakdown</div>
+            <div class="chart-subtitle">New ARN vs Old ARN leads</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="arnChart" height="220"></canvas>
+        </div>
+      </div>
+
+      <!-- State Distribution -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Geographic Distribution</div>
+            <div class="chart-subtitle">Leads by state</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="stateChart" height="220"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leads Table -->
+    <p class="section-title">Lead Records</p>
+    <div class="table-card">
+      <div class="table-header">
+        <div class="table-title-group">
+          <span class="table-title">All Leads</span>
+          <span class="table-count" id="table-count">Loading...</span>
+        </div>
+        <div class="table-controls">
+          <div class="search-input-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-input" placeholder="Search name, email, company..." autocomplete="off" />
+          </div>
+          <select class="filter-select" id="status-filter">
+            <option value="">All Status</option>
+          </select>
+          <select class="filter-select" id="source-filter">
+            <option value="">All Sources</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-sort="name">Name <span class="sort-icon">↕</span></th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th data-sort="company">Company <span class="sort-icon">↕</span></th>
+              <th>Source</th>
+              <th data-sort="status">Status <span class="sort-icon">↕</span></th>
+              <th data-sort="rating">Rating <span class="sort-icon">↕</span></th>
+              <th data-sort="created">Created <span class="sort-icon">↕</span></th>
+            </tr>
+          </thead>
+          <tbody id="leads-tbody">
+            <tr>
+              <td colspan="8">
+                <div class="empty-state">
+                  <div class="empty-icon">⏳</div>
+                  <div class="empty-text">Loading leads...</div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination" id="pagination">
+        <span class="pagination-info" id="pagination-info">—</span>
+        <div class="pagination-controls" id="pagination-controls"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ════════════════════════════════════════════
+       JAVASCRIPT
+  ════════════════════════════════════════════ -->
+  <script>
+    // ─────────────────────────────────────────────
+    // STATE
+    // ─────────────────────────────────────────────
+    let allLeads = [];
+    let allAccounts = [];
+    let allContacts = [];
+    let filteredLeads = [];
+    let stats = null;
+    let globalAccountsCount = 0;
+    let globalContactsCount = 0;
+    let currentPage = 1;
+    const PAGE_SIZE = 25;
+    let sortField = 'created';
+    let sortDir = 'desc';
+    let searchTimer = null;
+
+    // Chart instances
+    let sourceChart, statusChart, trendChart, arnChart, stateChart;
+
+    // Color palettes
+    const PALETTE = [
+      '#00b4d8', '#a855f7', '#22c55e', '#f97316', '#eab308',
+      '#ec4899', '#14b8a6', '#f43f5e', '#6366f1', '#84cc16',
+      '#fb923c', '#2dd4bf', '#818cf8', '#34d399', '#fbbf24'
+    ];
+
+    // ─────────────────────────────────────────────
+    // UTILITIES
+    // ─────────────────────────────────────────────
+    function fmt(n) {
+      if (n === null || n === undefined) return '—';
+      return Number(n).toLocaleString();
+    }
+
+    function fmtDate(str) {
+      if (!str) return '—';
+      const d = new Date(str);
+      return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function makeIndiaDate(year, month, day, hour, minute, second, ms) {
+      const m = String(month + 1).padStart(2, '0');
+      const d = String(day).padStart(2, '0');
+      const h = String(hour).padStart(2, '0');
+      const min = String(minute).padStart(2, '0');
+      const s = String(second).padStart(2, '0');
+      const mill = String(ms).padStart(3, '0');
+      return new Date(`${year}-${m}-${d}T${h}:${min}:${s}.${mill}+05:30`);
+    }
+
+    // Month name → 0-based index (handles abbreviations like "sept")
+    const MONTH_NAME_MAP = {
+      january: 0, february: 1, march: 2, april: 3, may: 4, june: 5,
+      july: 6, august: 7, september: 8, sept: 8, october: 9, november: 10, december: 11
+    };
+
+    function getMonthYearFromTags(tags) {
+      if (!tags || !Array.isArray(tags)) return null;
+      for (const t of tags) {
+        const name = ((typeof t === 'string' ? t : t.name) || '').toLowerCase().trim();
+        const yearMatch = name.match(/\b(20\d{2})\b/);
+        if (!yearMatch) continue;
+        const year = parseInt(yearMatch[1]);
+        for (const [monthName, monthIdx] of Object.entries(MONTH_NAME_MAP)) {
+          if (name.includes(monthName)) {
+            return { month: monthIdx, year };
+          }
+        }
+      }
+      return null;
+    }
+
+    // Tag-first date range check:
+    // - If item has a month/year tag → include ONLY if that tag's month overlaps the date range
+    // - If item has NO month/year tag → exclude (unclassified, not yet assigned to a month)
+    function isItemInDateRange(item, start, end) {
+      const my = getMonthYearFromTags(item.Tag);
+      if (my) {
+        // Has a month/year tag — use tag month as source of truth
+        const lastDay = new Date(my.year, my.month + 1, 0).getDate();
+        const monthStart = makeIndiaDate(my.year, my.month, 1, 0, 0, 0, 0);
+        const monthEnd = makeIndiaDate(my.year, my.month, lastDay, 23, 59, 59, 999);
+        return monthEnd >= start && monthStart <= end;
+      } else {
+        // No month/year tag — item is unclassified, exclude from date-filtered views
+        return false;
+      }
+    }
+
+    function filterByDateOrTag(items, startStr, endStr) {
+      if (!startStr && !endStr) return items;
+      const start = startStr ? new Date(startStr + 'T00:00:00+05:30') : new Date('1970-01-01');
+      const end = endStr ? new Date(endStr + 'T23:59:59.999+05:30') : new Date();
+      return items.filter(item => isItemInDateRange(item, start, end));
+    }
+
+    function initials(lead) {
+      const f = (lead.First_Name || '').charAt(0).toUpperCase();
+      const l = (lead.Last_Name || '').charAt(0).toUpperCase();
+      return (f + l) || '?';
+    }
+
+    function randomColor(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      return PALETTE[Math.abs(hash) % PALETTE.length];
+    }
+
+    function getStatusClass(status) {
+      if (!status) return 'status-default';
+      const s = status.toLowerCase();
+      if (s.includes('new')) return 'status-new';
+      if (s.includes('contact')) return 'status-contacted';
+      if (s.includes('convert')) return 'status-converted';
+      if (s.includes('dead') || s.includes('lost') || s.includes('junk')) return 'status-dead';
+      return 'status-default';
+    }
+
+    function getRatingClass(rating) {
+      if (!rating) return '';
+      const r = rating.toLowerCase();
+      if (r === 'hot') return 'rating-hot';
+      if (r === 'warm') return 'rating-warm';
+      if (r === 'cold') return 'rating-cold';
+      return '';
+    }
+
+    function setLoading(msg, sub) {
+      document.getElementById('loading-overlay').classList.remove('hidden');
+      document.getElementById('loading-sub-text').textContent = sub || 'Please wait...';
+    }
+
+    function hideLoading() {
+      document.getElementById('loading-overlay').classList.add('hidden');
+    }
+
+    function showError(msg) {
+      const toast = document.getElementById('error-toast');
+      document.getElementById('error-message').textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 8000);
+    }
+
+    function updateLastUpdated() {
+      const now = new Date();
+      document.getElementById('last-updated').textContent =
+        'Updated ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // ─────────────────────────────────────────────
+    // API FETCH
+    // ─────────────────────────────────────────────
+    async function fetchStats() {
+      const res = await fetch('/api/stats');
+      if (!res.ok) throw new Error(`Stats API error: ${res.status}`);
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Stats fetch failed');
+      return json.data;
+    }
+
+    async function fetchLeads() {
+      const res = await fetch('/api/leads');
+      if (!res.ok) throw new Error(`Leads API error: ${res.status}`);
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Leads fetch failed');
+      return json.data;
+    }
+
+    // ─────────────────────────────────────────────
+    // STATS CALCULATION (FRONTEND)
+    // ─────────────────────────────────────────────
+    function calculateLeadStats(leads, accounts = [], contacts = [], startStr, endStr) {
+      const statusCount = {};
+      const sourceCount = {};
+      const monthlyCount = {};
+      let newArnCount = 0;
+      let oldArnCount = 0;
+      const stateCount = {};
+      let thisMonth = 0;
+      let lastMonth = 0;
+      let converted = 0;
+
+      const checkNewArn = (item) => {
+        const tags = item.Tag || [];
+        return tags.some(t => {
+          const name = ((typeof t === 'string' ? t : t.name) || '').toLowerCase().trim();
+          return name.includes('new arn');
+        });
+      };
+
+      const now = new Date();
+      let refDate = now;
+      if (startStr) {
+        refDate = new Date(startStr);
+      }
+
+      const currentMonthName = refDate.toLocaleString('en-US', { month: 'long' }).toLowerCase();
+      const currentYear = refDate.getFullYear();
+
+      const lastMonthDate = new Date(refDate.getFullYear(), refDate.getMonth() - 1, 1);
+      const lastMonthName = lastMonthDate.toLocaleString('en-US', { month: 'long' }).toLowerCase();
+      const lastMonthYear = lastMonthDate.getFullYear();
+
+      leads.forEach(lead => {
+        // Status
+        const status = lead.Lead_Status || 'Unknown';
+        statusCount[status] = (statusCount[status] || 0) + 1;
+
+        // Source
+        const source = lead.Lead_Source || 'Unknown';
+        sourceCount[source] = (sourceCount[source] || 0) + 1;
+
+        // ARN classification based on Tags
+        if (checkNewArn(lead)) {
+          newArnCount++;
+        } else {
+          oldArnCount++;
+        }
+
+        // State
+        const state = lead.State || 'Unknown';
+        stateCount[state] = (stateCount[state] || 0) + 1;
+
+        // Converted
+        if (lead.Converted) {
+          converted++;
+        }
+      });
+
+      // Count across accounts and contacts for ARN breakdown
+      accounts.forEach(account => {
+        if (checkNewArn(account)) {
+          newArnCount++;
+        } else {
+          oldArnCount++;
+        }
+      });
+
+      contacts.forEach(contact => {
+        if (checkNewArn(contact)) {
+          newArnCount++;
+        } else {
+          oldArnCount++;
+        }
+      });
+
+      // Monthly trend (last 12 months) - always use allLeads to show full historical context
+      allLeads.forEach(lead => {
+        if (lead.Created_Time) {
+          const d = new Date(lead.Created_Time);
+          const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+          monthlyCount[key] = (monthlyCount[key] || 0) + 1;
+        }
+      });
+
+      // Growth Rate - This Month & Last Month tag or date range counts
+      if (startStr || endStr) {
+        const start = startStr ? new Date(startStr + 'T00:00:00+05:30') : new Date('1970-01-01');
+        const end = endStr ? new Date(endStr + 'T23:59:59.999+05:30') : new Date();
+        const duration = end.getTime() - start.getTime();
+        const prevStart = new Date(start.getTime() - duration);
+        const prevEnd = new Date(end.getTime() - duration);
+
+        allLeads.forEach(lead => {
+          if (isItemInDateRange(lead, start, end)) thisMonth++;
+          if (isItemInDateRange(lead, prevStart, prevEnd)) lastMonth++;
+        });
+      } else {
+        allLeads.forEach(lead => {
+          const tags = lead.Tag || [];
+          const hasCurrentMonthTag = tags.some(t => {
+            const name = ((typeof t === 'string' ? t : t.name) || '').toLowerCase();
+            return name.includes(currentMonthName) && name.includes(String(currentYear));
+          });
+          const hasLastMonthTag = tags.some(t => {
+            const name = ((typeof t === 'string' ? t : t.name) || '').toLowerCase();
+            return name.includes(lastMonthName) && name.includes(String(lastMonthYear));
+          });
+
+          if (hasCurrentMonthTag) thisMonth++;
+          if (hasLastMonthTag) lastMonth++;
+        });
+      }
+
+      // Build last 12 months trend
+      const trend = [];
+      for (let i = 11; i >= 0; i--) {
+        const d = new Date(refDate.getFullYear(), refDate.getMonth() - i, 1);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        const label = d.toLocaleString('default', { month: 'short', year: '2-digit' });
+        trend.push({ key, label, count: monthlyCount[key] || 0 });
+      }
+
+      // Top 10 for each category
+      const topN = (obj, n = 10) =>
+        Object.entries(obj)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, n)
+          .map(([label, count]) => ({ label, count }));
+
+      const flowOrder = [
+        { label: 'New', match: ['new'] },
+        { label: 'Follow-up (pre-demo)', match: ['follow-up (pre- demo)', 'follow-up (pre-demo)'] },
+        { label: 'Demo Scheduled', match: ['demo scheduled'] },
+        { label: 'Demo Rescheduled', match: ['demo reschedule', 'demo rescheduled'] },
+        { label: 'Demo Conducted', match: ['demo conducted'] },
+        { label: 'Follow-up (post-demo)', match: ['follow-up (post-demo)', 'follow-up (post- demo)'] },
+        { label: 'Not Interested', match: ['not interested', 'trial done - not interested'] }
+      ];
+
+      const statusBreakdown = flowOrder.map(f => {
+        let count = 0;
+        leads.forEach(l => {
+          const status = (l.Lead_Status || '').toLowerCase().trim();
+          if (f.match.some(m => status === m || status.includes(m))) {
+            count++;
+          }
+        });
+        return { label: f.label, count };
+      });
+
+      return {
+        total: leads.length,
+        converted,
+        unconverted: leads.length - converted,
+        thisMonth,
+        lastMonth,
+        growthRate:
+          lastMonth > 0
+            ? (((thisMonth - lastMonth) / lastMonth) * 100).toFixed(1)
+            : null,
+        statusBreakdown,
+        sourceBreakdown: (() => {
+          // Excluded sources — never shown on chart
+          const EXCLUDED_SOURCES = new Set(['Sendy- Mailer', 'Unknown']);
+          // All known lead sources (excluding the ones above)
+          const ALL_LEAD_SOURCES = [
+            'Old Demo Abhishek', 'Calling', 'Tele-calling- Ami', 'Website',
+            'Mailer Form', 'LIC MF', 'Inbound Call', 'Calendly-Mailer',
+            'Tele-calling-Ankita', 'Calendly-Website', 'WhatsApp',
+            'External Referral'
+          ];
+          // Include any new sources from data, also excluding the blocked ones
+          const allSources = [...new Set([...ALL_LEAD_SOURCES, ...Object.keys(sourceCount)])]
+            .filter(src => !EXCLUDED_SOURCES.has(src));
+          return allSources
+            .map(src => ({ label: src, count: sourceCount[src] || 0 }))
+            .sort((a, b) => b.count - a.count);
+        })(),
+        arnBreakdown: [
+          { label: 'New ARN', count: newArnCount },
+          { label: 'Old ARN', count: oldArnCount }
+        ],
+        stateBreakdown: topN(stateCount, 10),
+        monthlyTrend: trend
+      };
+    }
+
+
+    // ─────────────────────────────────────────────
+    // KPI CARDS
+    // ─────────────────────────────────────────────
+    function renderKPIs(s, isDateFilterActive) {
+      const leadsCount = s.total;
+      const totalLeadsSum = leadsCount + globalContactsCount + globalAccountsCount;
+
+      // Conversion rate from total leads to subscribed
+      const convRate = totalLeadsSum > 0 ? (globalAccountsCount / totalLeadsSum) * 100 : 0;
+
+      // Animate number counting
+      animateCount('kpi-total', totalLeadsSum);
+      animateCount('kpi-this-month', leadsCount);
+      animateCount('kpi-converted', convRate, true);
+
+      // Accounts and Contacts (Global)
+      animateCount('kpi-accounts', globalAccountsCount);
+      animateCount('kpi-contacts', globalContactsCount);
+
+      // Growth badge
+      if (s.growthRate !== null) {
+        const pct = parseFloat(s.growthRate);
+        const badge = document.getElementById('kpi-growth-badge');
+        badge.textContent = (pct >= 0 ? '+' : '') + pct + '%';
+        badge.className = 'kpi-badge ' + (pct >= 0 ? 'up' : 'down');
+      }
+
+      // Converted count badge under the conversion rate
+      const convBadge = document.getElementById('kpi-conv-rate');
+      convBadge.textContent = fmt(s.converted);
+      convBadge.className = 'kpi-badge neutral';
+    }
+
+    function renderFunnel(leads, isDateFilterActive) {
+      const subscribed = globalAccountsCount;
+      const trial = globalContactsCount;
+
+      let newCount = 0;
+      let demoScheduledLeadsCount = 0;
+      let demoConductedLeadsCount = 0;
+
+      leads.forEach(l => {
+        const status = (l.Lead_Status || '').toLowerCase().trim();
+        if (status === 'new') {
+          newCount++;
+        }
+        if (l.Date_of_Demo_Schedule) {
+          demoScheduledLeadsCount++;
+        }
+        if (l.Date_of_Demo_Conducted) {
+          demoConductedLeadsCount++;
+        }
+      });
+
+      const totalLeads = leads.length + trial + subscribed;
+      const connected = totalLeads - newCount;
+      const stageDemoScheduled = demoScheduledLeadsCount + trial + subscribed;
+      const stageDemoConducted = demoConductedLeadsCount + trial + subscribed;
+
+      document.getElementById('funnel-stage-1').textContent = `Total Leads: ${fmt(totalLeads)}`;
+      document.getElementById('funnel-stage-2').textContent = `Connected: ${fmt(connected)}`;
+      document.getElementById('funnel-stage-3').textContent = `Demo Scheduled: ${fmt(stageDemoScheduled)}`;
+      document.getElementById('funnel-stage-4').textContent = `Demo Conducted: ${fmt(stageDemoConducted)}`;
+      document.getElementById('funnel-stage-5').textContent = `Trial: ${fmt(trial)}`;
+      document.getElementById('funnel-stage-6').textContent = `Subscribed: ${fmt(subscribed)}`;
+    }
+
+    function animateCount(id, target, isPercentage = false) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const start = 0;
+      const duration = 900;
+      const startTime = performance.now();
+
+      function update(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const val = eased * target;
+        el.textContent = isPercentage ? val.toFixed(1) + '%' : fmt(Math.round(val));
+        if (progress < 1) requestAnimationFrame(update);
+      }
+      requestAnimationFrame(update);
+    }
+
+    // ─────────────────────────────────────────────
+    // CHART.JS GLOBAL DEFAULTS
+    // ─────────────────────────────────────────────
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    Chart.defaults.plugins.legend.display = false;
+
+    function chartDefaults(type) {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 800, easing: 'easeOutQuart' },
+        plugins: {
+          tooltip: {
+            backgroundColor: '#162338',
+            borderColor: 'rgba(0,180,216,0.3)',
+            borderWidth: 1,
+            padding: 10,
+            titleFont: { weight: '700', size: 13 },
+            bodyFont: { size: 12 },
+            titleColor: '#f0f6ff',
+            bodyColor: '#94a3b8',
+            cornerRadius: 8,
+          }
+        }
+      };
+    }
+
+    // ─────────────────────────────────────────────
+    // CHARTS
+    // ─────────────────────────────────────────────
+    function renderSourceChart(data) {
+      // Sort highest → lowest for display
+      const sorted = [...data].sort((a, b) => b.count - a.count);
+      const labels = sorted.map(d => d.label);
+      const counts = sorted.map(d => d.count);
+      const colors = labels.map((_, i) => PALETTE[i % PALETTE.length]);
+
+      document.getElementById('source-total-badge').textContent =
+        `${counts.reduce((a, b) => a + b, 0)} total`;
+
+      // Legend with count badges
+      const legend = document.getElementById('source-legend');
+      legend.innerHTML = labels.map((l, i) =>
+        `<div class="legend-item">
+          <div class="legend-dot" style="background:${colors[i]}"></div>
+          <span>${l}</span>
+          <span style="margin-left:auto;font-weight:600;color:${colors[i]}">${counts[i]}</span>
+        </div>`
+      ).join('');
+
+      if (sourceChart) sourceChart.destroy();
+      const ctx = document.getElementById('sourceChart').getContext('2d');
+      sourceChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            data: counts,
+            backgroundColor: colors.map(c => c + 'bb'),
+            borderColor: colors,
+            borderWidth: 2,
+            borderRadius: 6,
+            borderSkipped: false
+          }]
+        },
+        options: {
+          ...chartDefaults('bar'),
+          indexAxis: 'y',
+          scales: {
+            x: {
+              grid: { color: 'rgba(255,255,255,0.04)' },
+              ticks: { color: '#4e6072', font: { size: 11 }, precision: 0 },
+              border: { display: false },
+              beginAtZero: true
+            },
+            y: {
+              grid: { display: false },
+              ticks: { color: '#94a3b8', font: { size: 11 } },
+              border: { display: false }
+            }
+          },
+          plugins: {
+            ...chartDefaults('bar').plugins,
+            datalabels: {
+              anchor: 'end',
+              align: 'end',
+              color: '#94a3b8',
+              font: { size: 10, weight: '600' },
+              formatter: v => v > 0 ? v : ''
+            }
+          }
+        }
+      });
+    }
+
+    function renderStatusChart(data) {
+      const labels = data.map(d => d.label);
+      const counts = data.map(d => d.count);
+      const colors = labels.map((l, i) => PALETTE[i % PALETTE.length]);
+
+      if (statusChart) statusChart.destroy();
+      const ctx = document.getElementById('statusChart').getContext('2d');
+      statusChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            data: counts,
+            backgroundColor: colors.map(c => c + 'cc'),
+            borderColor: colors,
+            borderWidth: 2,
+            borderRadius: 6,
+            borderSkipped: false
+          }]
+        },
+        options: {
+          ...chartDefaults('bar'),
+          indexAxis: 'y',
+          scales: {
+            x: {
+              grid: { color: 'rgba(255,255,255,0.04)' },
+              ticks: { color: '#4e6072', font: { size: 11 } },
+              border: { display: false }
+            },
+            y: {
+              grid: { display: false },
+              ticks: { color: '#94a3b8', font: { size: 11 } },
+              border: { display: false }
+            }
+          }
+        }
+      });
+    }
+
+    function renderTrendChart(data) {
+      const labels = data.map(d => d.label);
+      const counts = data.map(d => d.count);
+
+      if (trendChart) trendChart.destroy();
+      const ctx = document.getElementById('trendChart').getContext('2d');
+
+      const gradient = ctx.createLinearGradient(0, 0, 0, 220);
+      gradient.addColorStop(0, 'rgba(0,180,216,0.3)');
+      gradient.addColorStop(1, 'rgba(0,180,216,0)');
+
+      trendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            data: counts,
+            borderColor: '#00b4d8',
+            backgroundColor: gradient,
+            borderWidth: 2.5,
+            pointBackgroundColor: '#00b4d8',
+            pointBorderColor: '#0d1b2a',
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 7,
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: {
+          ...chartDefaults('line'),
+          scales: {
+            x: {
+              grid: { color: 'rgba(255,255,255,0.04)' },
+              ticks: { color: '#4e6072', font: { size: 11 } },
+              border: { display: false }
+            },
+            y: {
+              grid: { color: 'rgba(255,255,255,0.04)' },
+              ticks: { color: '#4e6072', font: { size: 11 }, precision: 0 },
+              border: { display: false },
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    function renderArnChart(data) {
+      const labels = data.map(d => d.label);
+      const counts = data.map(d => d.count);
+      const colors = ['#00b4d8', '#a855f7']; // New ARN (blue), Old ARN (purple)
+
+      if (arnChart) arnChart.destroy();
+      const ctx = document.getElementById('arnChart').getContext('2d');
+      arnChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels,
+          datasets: [{
+            data: counts,
+            backgroundColor: colors,
+            borderColor: '#0d1b2a',
+            borderWidth: 3,
+            hoverOffset: 8
+          }]
+        },
+        options: {
+          ...chartDefaults('doughnut'),
+          cutout: '68%',
+          plugins: {
+            ...chartDefaults().plugins,
+            legend: {
+              display: true,
+              position: 'bottom',
+              labels: {
+                color: '#94a3b8',
+                padding: 15,
+                font: { size: 11 }
+              }
+            },
+            tooltip: { ...chartDefaults().plugins?.tooltip }
+          }
+        }
+      });
+    }
+
+    function renderStateChart(data) {
+      const labels = data.map(d => d.label);
+      const counts = data.map(d => d.count);
+      const colors = labels.map((_, i) => PALETTE[(i + 5) % PALETTE.length]);
+
+      if (stateChart) stateChart.destroy();
+      const ctx = document.getElementById('stateChart').getContext('2d');
+      stateChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            data: counts,
+            backgroundColor: colors.map(c => c + 'bb'),
+            borderColor: colors,
+            borderWidth: 2,
+            borderRadius: 6,
+            borderSkipped: false
+          }]
+        },
+        options: {
+          ...chartDefaults('bar'),
+          indexAxis: 'y',
+          scales: {
+            x: {
+              grid: { color: 'rgba(255,255,255,0.04)' },
+              ticks: { color: '#4e6072', font: { size: 11 }, precision: 0 },
+              border: { display: false },
+              beginAtZero: true
+            },
+            y: {
+              grid: { display: false },
+              ticks: { color: '#94a3b8', font: { size: 11 } },
+              border: { display: false }
+            }
+          }
+        }
+      });
+    }
+
+    // ─────────────────────────────────────────────
+    // LEADS TABLE
+    // ─────────────────────────────────────────────
+    function applyFilters() {
+      const q = document.getElementById('search-input').value.trim().toLowerCase();
+      const statusF = document.getElementById('status-filter').value.toLowerCase();
+      const sourceF = document.getElementById('source-filter').value.toLowerCase();
+      const startStr = document.getElementById('start-date').value;
+      const endStr = document.getElementById('end-date').value;
+
+      const isDateFilterActive = !!(startStr || endStr);
+
+      // Filter by Date Range (using +05:30 India timezone for absolute match with Zoho)
+      let dateFilteredLeads = allLeads;
+      let dateFilteredAccounts = allAccounts;
+      let dateFilteredContacts = allContacts;
+
+      if (isDateFilterActive) {
+        dateFilteredLeads = filterByDateOrTag(allLeads, startStr, endStr);
+        dateFilteredAccounts = filterByDateOrTag(allAccounts, startStr, endStr);
+        dateFilteredContacts = filterByDateOrTag(allContacts, startStr, endStr);
+      } else {
+        // Default: show all data (no filtering)
+        dateFilteredLeads = allLeads;
+        dateFilteredAccounts = allAccounts;
+        dateFilteredContacts = allContacts;
+      }
+
+      globalAccountsCount = dateFilteredAccounts.length;
+      globalContactsCount = dateFilteredContacts.length;
+
+      const activeAccounts = dateFilteredAccounts;
+      const activeContacts = dateFilteredContacts;
+
+      // Update Accounts & Contacts KPI values
+      animateCount('kpi-accounts', globalAccountsCount);
+      animateCount('kpi-contacts', globalContactsCount);
+
+      // Re-calculate and render stats for the date-filtered subset
+      const dateStats = calculateLeadStats(dateFilteredLeads, activeAccounts, activeContacts, startStr, endStr);
+      renderKPIs(dateStats, isDateFilterActive);
+      renderFunnel(dateFilteredLeads, isDateFilterActive);
+      if (dateStats.sourceBreakdown?.length) renderSourceChart(dateStats.sourceBreakdown);
+      if (dateStats.statusBreakdown?.length) renderStatusChart(dateStats.statusBreakdown);
+      if (dateStats.monthlyTrend?.length) renderTrendChart(dateStats.monthlyTrend);
+      if (dateStats.arnBreakdown?.length) renderArnChart(dateStats.arnBreakdown);
+      if (dateStats.stateBreakdown?.length) renderStateChart(dateStats.stateBreakdown);
+
+      // Now apply Search and Dropdown filters on top
+      filteredLeads = dateFilteredLeads.filter(lead => {
+        const name = `${lead.First_Name || ''} ${lead.Last_Name || ''}`.toLowerCase();
+        const email = (lead.Email || '').toLowerCase();
+        const company = (lead.Company || '').toLowerCase();
+        const phone = (lead.Phone || lead.Mobile || '').toLowerCase();
+
+        if (q && !name.includes(q) && !email.includes(q) &&
+          !company.includes(q) && !phone.includes(q)) return false;
+        if (statusF && (lead.Lead_Status || '').toLowerCase() !== statusF) return false;
+        if (sourceF && (lead.Lead_Source || '').toLowerCase() !== sourceF) return false;
+        return true;
+      });
+
+      // Sort
+      filteredLeads.sort((a, b) => {
+        let va, vb;
+        switch (sortField) {
+          case 'name':
+            va = `${a.First_Name || ''} ${a.Last_Name || ''}`.toLowerCase();
+            vb = `${b.First_Name || ''} ${b.Last_Name || ''}`.toLowerCase();
+            break;
+          case 'company':
+            va = (a.Company || '').toLowerCase();
+            vb = (b.Company || '').toLowerCase();
+            break;
+          case 'status':
+            va = (a.Lead_Status || '').toLowerCase();
+            vb = (b.Lead_Status || '').toLowerCase();
+            break;
+          case 'rating':
+            va = (a.Rating || '').toLowerCase();
+            vb = (b.Rating || '').toLowerCase();
+            break;
+          default: // created
+            va = new Date(a.Created_Time || 0).getTime();
+            vb = new Date(b.Created_Time || 0).getTime();
+            break;
+        }
+        if (va < vb) return sortDir === 'asc' ? -1 : 1;
+        if (va > vb) return sortDir === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      currentPage = 1;
+      renderTable();
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('leads-tbody');
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const end = start + PAGE_SIZE;
+      const page = filteredLeads.slice(start, end);
+
+      document.getElementById('table-count').textContent =
+        `${fmt(filteredLeads.length)} leads` +
+        (filteredLeads.length !== allLeads.length ? ` (filtered from ${fmt(allLeads.length)})` : '');
+
+      if (page.length === 0) {
+        tbody.innerHTML = `
+          <tr><td colspan="8">
+            <div class="empty-state">
+              <div class="empty-icon">🔍</div>
+              <div class="empty-text">No leads found</div>
+              <div class="empty-sub">Try adjusting your search or filters</div>
+            </div>
+          </td></tr>`;
+        renderPagination();
+        return;
+      }
+
+      tbody.innerHTML = page.map(lead => {
+        const name = `${lead.First_Name || ''} ${lead.Last_Name || ''}`.trim() || 'Unknown';
+        const color = randomColor(name);
+        const statusClass = getStatusClass(lead.Lead_Status);
+        const ratingClass = getRatingClass(lead.Rating);
+
+        return `
+          <tr>
+            <td>
+              <div class="lead-name-cell">
+                <div class="lead-avatar" style="background:${color}22;color:${color};">
+                  ${initials(lead)}
+                </div>
+                <div>
+                  <div class="lead-name">${escHtml(name)}</div>
+                  <div class="lead-company">${escHtml(lead.Company || '—')}</div>
+                </div>
+              </div>
+            </td>
+            <td class="lead-email">${escHtml(lead.Email || '—')}</td>
+            <td style="color:var(--text-secondary);font-size:12px">${escHtml(lead.Phone || lead.Mobile || '—')}</td>
+            <td style="color:var(--text-secondary);font-size:12px">${escHtml(lead.Company || '—')}</td>
+            <td><span class="source-tag">${escHtml(lead.Lead_Source || '—')}</span></td>
+            <td>
+              <span class="status-pill ${statusClass}">
+                <span class="status-dot-sm"></span>
+                ${escHtml(lead.Lead_Status || 'Unknown')}
+              </span>
+            </td>
+            <td class="${ratingClass}">${escHtml(lead.Rating || '—')}</td>
+            <td style="color:var(--text-muted);font-size:12px">${fmtDate(lead.Created_Time)}</td>
+          </tr>`;
+      }).join('');
+
+      renderPagination();
+    }
+
+    function escHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function renderPagination() {
+      const total = filteredLeads.length;
+      const pages = Math.ceil(total / PAGE_SIZE);
+      const start = (currentPage - 1) * PAGE_SIZE + 1;
+      const end = Math.min(currentPage * PAGE_SIZE, total);
+
+      document.getElementById('pagination-info').textContent =
+        total > 0 ? `Showing ${fmt(start)}–${fmt(end)} of ${fmt(total)}` : 'No results';
+
+      const ctrl = document.getElementById('pagination-controls');
+      if (pages <= 1) { ctrl.innerHTML = ''; return; }
+
+      let buttons = '';
+
+      // Prev
+      buttons += `<button class="page-btn" id="pg-prev" ${currentPage <= 1 ? 'disabled' : ''}>‹</button>`;
+
+      // Page numbers
+      const showPages = getPageRange(currentPage, pages);
+      let lastWas = null;
+      showPages.forEach(p => {
+        if (p === '...') {
+          if (lastWas !== '...') buttons += `<button class="page-btn" disabled>…</button>`;
+        } else {
+          buttons += `<button class="page-btn${p === currentPage ? ' active' : ''}" data-page="${p}">${p}</button>`;
+        }
+        lastWas = p;
+      });
+
+      // Next
+      buttons += `<button class="page-btn" id="pg-next" ${currentPage >= pages ? 'disabled' : ''}>›</button>`;
+
+      ctrl.innerHTML = buttons;
+
+      ctrl.querySelectorAll('[data-page]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentPage = parseInt(btn.dataset.page);
+          renderTable();
+          window.scrollTo({ top: document.querySelector('.table-card').offsetTop - 80, behavior: 'smooth' });
+        });
+      });
+
+      const prev = ctrl.querySelector('#pg-prev');
+      const next = ctrl.querySelector('#pg-next');
+      if (prev) prev.addEventListener('click', () => { currentPage--; renderTable(); });
+      if (next) next.addEventListener('click', () => { currentPage++; renderTable(); });
+    }
+
+    function getPageRange(cur, total) {
+      const pages = [];
+      if (total <= 7) {
+        for (let i = 1; i <= total; i++) pages.push(i);
+      } else {
+        pages.push(1);
+        if (cur > 3) pages.push('...');
+        for (let i = Math.max(2, cur - 1); i <= Math.min(total - 1, cur + 1); i++) pages.push(i);
+        if (cur < total - 2) pages.push('...');
+        pages.push(total);
+      }
+      return pages;
+    }
+
+    // ─────────────────────────────────────────────
+    // FILTERS SETUP
+    // ─────────────────────────────────────────────
+    function setupFilters(leads) {
+      const statuses = [...new Set(leads.map(l => l.Lead_Status).filter(Boolean))].sort();
+      const sources = [...new Set(leads.map(l => l.Lead_Source).filter(Boolean))].sort();
+
+      const statusSel = document.getElementById('status-filter');
+      statuses.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s; opt.textContent = s;
+        statusSel.appendChild(opt);
+      });
+
+      const sourceSel = document.getElementById('source-filter');
+      sources.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s; opt.textContent = s;
+        sourceSel.appendChild(opt);
+      });
+    }
+
+    // ─────────────────────────────────────────────
+    // SORT HEADERS
+    // ─────────────────────────────────────────────
+    function setupSort() {
+      document.querySelectorAll('thead th[data-sort]').forEach(th => {
+        th.addEventListener('click', () => {
+          const field = th.dataset.sort;
+          if (sortField === field) {
+            sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+          } else {
+            sortField = field;
+            sortDir = 'asc';
+          }
+          document.querySelectorAll('thead th').forEach(t => t.classList.remove('sort-active'));
+          th.classList.add('sort-active');
+          const icon = th.querySelector('.sort-icon');
+          if (icon) icon.textContent = sortDir === 'asc' ? '↑' : '↓';
+          applyFilters();
+        });
+      });
+    }
+
+    // ─────────────────────────────────────────────
+    // CSV EXPORT
+    // ─────────────────────────────────────────────
+    function exportCSV() {
+      const cols = ['First_Name', 'Last_Name', 'Email', 'Phone', 'Company', 'Lead_Source', 'Lead_Status', 'Rating', 'Industry', 'Country', 'Created_Time'];
+      const header = cols.join(',');
+      const rows = filteredLeads.map(lead =>
+        cols.map(c => {
+          const v = lead[c] || '';
+          return `"${String(v).replace(/"/g, '""')}"`;
+        }).join(',')
+      );
+      const csv = [header, ...rows].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `zoho-leads-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    async function fetchAccounts() {
+      try {
+        const res = await fetch('/api/accounts');
+        if (!res.ok) return [];
+        const json = await res.json();
+        return json.success ? json.data : [];
+      } catch (err) {
+        console.warn('Could not fetch Accounts:', err);
+        return [];
+      }
+    }
+
+    async function fetchContacts() {
+      try {
+        const res = await fetch('/api/contacts');
+        if (!res.ok) return [];
+        const json = await res.json();
+        return json.success ? json.data : [];
+      } catch (err) {
+        console.warn('Could not fetch Contacts:', err);
+        return [];
+      }
+    }
+
+    // ─────────────────────────────────────────────
+    // MAIN LOAD
+    // ─────────────────────────────────────────────
+    async function loadDashboard() {
+      setLoading('Loading Dashboard...', 'Connecting to Zoho CRM API...');
+      document.getElementById('setup-notice').classList.remove('show');
+
+      try {
+        // Fetch all in parallel
+        document.getElementById('loading-sub-text').textContent = 'Fetching leads, accounts & contacts...';
+        const [leadsData, accountsData, contactsData] = await Promise.all([
+          fetchLeads(),
+          fetchAccounts(),
+          fetchContacts()
+        ]);
+
+        allLeads = leadsData;
+        allAccounts = accountsData;
+        allContacts = contactsData;
+        filteredLeads = [...allLeads];
+
+        // Setup table filters
+        setupFilters(allLeads);
+        setupSort();
+
+        // Apply filters (computes stats, filters accounts & contacts, renders)
+        applyFilters();
+
+        updateLastUpdated();
+        hideLoading();
+
+      } catch (err) {
+        hideLoading();
+        showError(err.message);
+        document.getElementById('setup-notice').classList.add('show');
+        console.error('Dashboard load error:', err);
+
+        // Show placeholder UI
+        globalAccountsCount = 0;
+        globalContactsCount = 0;
+        renderKPIs({ total: 0, converted: 0, unconverted: 0, thisMonth: 0, lastMonth: 0, growthRate: null });
+        document.getElementById('table-count').textContent = 'Connect Zoho CRM to see leads';
+        document.getElementById('leads-tbody').innerHTML = `
+          <tr><td colspan="8">
+            <div class="empty-state">
+              <div class="empty-icon">🔌</div>
+              <div class="empty-text">Not connected to Zoho CRM</div>
+              <div class="empty-sub">Follow the setup steps above to connect your account</div>
+            </div>
+          </td></tr>`;
+      }
+    }
+
+    // ─────────────────────────────────────────────
+    // EVENT LISTENERS
+    // ─────────────────────────────────────────────
+    document.getElementById('refresh-btn').addEventListener('click', loadDashboard);
+
+    document.getElementById('export-btn').addEventListener('click', exportCSV);
+
+    document.getElementById('search-input').addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(applyFilters, 350);
+    });
+
+    document.getElementById('status-filter').addEventListener('change', applyFilters);
+    document.getElementById('source-filter').addEventListener('change', applyFilters);
+
+    // Date filters
+    document.getElementById('start-date').addEventListener('change', applyFilters);
+    document.getElementById('end-date').addEventListener('change', applyFilters);
+    document.getElementById('clear-dates-btn').addEventListener('click', () => {
+      document.getElementById('start-date').value = '';
+      document.getElementById('end-date').value = '';
+      applyFilters();
+    });
+
+    // ─────────────────────────────────────────────
+    // INIT
+    // ─────────────────────────────────────────────
+    loadDashboard();
+  </script>
+</body>
+
+</html>
