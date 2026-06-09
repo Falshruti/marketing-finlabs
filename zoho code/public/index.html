@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zoho CRM — Lead Dashboard</title>
+  <title>CRM — Lead Dashboard</title>
   <meta name="description"
-    content="Real-time Zoho CRM Lead Dashboard with analytics, KPIs, charts and searchable lead table." />
+    content="Real-time CRM Lead Dashboard with analytics, KPIs, charts and searchable lead table." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet" />
@@ -1243,7 +1243,7 @@
   <div class="loading-overlay" id="loading-overlay">
     <div class="spinner"></div>
     <div class="loading-text">Loading Dashboard...</div>
-    <div class="loading-sub" id="loading-sub-text">Connecting to Zoho CRM API</div>
+    <div class="loading-sub" id="loading-sub-text">Connecting to CRM API</div>
   </div>
 
   <!-- Error Toast -->
@@ -1261,7 +1261,7 @@
         <div class="logo-icon">📊</div>
         <div class="logo-text">
           <span class="logo-title">Lead Dashboard</span>
-          <span class="logo-subtitle">Zoho CRM Analytics</span>
+          <span class="logo-subtitle">CRM Analytics</span>
         </div>
       </a>
       <div class="header-right">
@@ -1285,7 +1285,7 @@
   ════════════════════════════════════════════ -->
   <section class="hero">
     <h1>Lead <span>Intelligence</span> Dashboard</h1>
-    <p class="hero-sub">Real-time analytics from your Zoho CRM — Updated automatically</p>
+    <p class="hero-sub">Real-time analytics from your CRM — Updated automatically</p>
   </section>
 
   <!-- ════════════════════════════════════════════
@@ -1316,9 +1316,9 @@
 
     <!-- Setup Notice (shown if API fails) -->
     <div class="setup-notice" id="setup-notice">
-      <div class="setup-notice-title">⚙️ Setup Required — Connect to Zoho CRM</div>
+      <div class="setup-notice-title">⚙️ Setup Required — Connect to CRM</div>
       <p style="font-size:13px;color:var(--text-secondary)">
-        The dashboard is running but needs your Zoho credentials. Follow these steps:
+        The dashboard is running but needs your CRM credentials. Follow these steps:
       </p>
       <ol class="setup-steps">
         <li><span class="step-num">1</span> Go to <strong>api-console.zoho.in</strong> → Create a Server-based app →
@@ -2557,7 +2557,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `zoho-leads-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.download = `crm-leads-${new Date().toISOString().slice(0, 10)}.csv`;
       a.click();
       URL.revokeObjectURL(url);
     }
@@ -2590,7 +2590,7 @@
     // MAIN LOAD
     // ─────────────────────────────────────────────
     async function loadDashboard() {
-      setLoading('Loading Dashboard...', 'Connecting to Zoho CRM API...');
+      setLoading('Loading Dashboard...', 'Connecting to CRM API...');
       document.getElementById('setup-notice').classList.remove('show');
 
       try {
@@ -2627,12 +2627,12 @@
         globalAccountsCount = 0;
         globalContactsCount = 0;
         renderKPIs({ total: 0, converted: 0, unconverted: 0, thisMonth: 0, lastMonth: 0, growthRate: null });
-        document.getElementById('table-count').textContent = 'Connect Zoho CRM to see leads';
+        document.getElementById('table-count').textContent = 'Connect CRM to see leads';
         document.getElementById('leads-tbody').innerHTML = `
           <tr><td colspan="8">
             <div class="empty-state">
               <div class="empty-icon">🔌</div>
-              <div class="empty-text">Not connected to Zoho CRM</div>
+              <div class="empty-text">Not connected to CRM</div>
               <div class="empty-sub">Follow the setup steps above to connect your account</div>
             </div>
           </td></tr>`;

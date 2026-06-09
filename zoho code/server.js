@@ -314,7 +314,7 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`\n🚀 Zoho CRM Lead Dashboard running at:`);
+  console.log(`\n🚀 CRM Lead Dashboard running at:`);
   console.log(`   \x1b[36mhttp://localhost:${PORT}\x1b[0m`);
   console.log(`\n📊 API Endpoints:`);
   console.log(`   GET /api/stats     → Dashboard statistics`);

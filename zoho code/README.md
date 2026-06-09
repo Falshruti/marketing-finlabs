@@ -1,6 +1,9 @@
-# Zoho CRM Lead Dashboard
+# CRM Lead Dashboard
 
-A real-time, beautiful web dashboard for your Zoho CRM Leads — with KPIs, charts, and a searchable table.
+A real-time, beautiful web dashboard for your CRM Leads — with KPIs, charts, and a searchable table.
+
+![CRM Lead Dashboard](public/screenshots/dashboard.png)
+![CRM Leads Table](public/screenshots/leads_table.png)
 
 ## Features
 
@@ -8,11 +11,11 @@ A real-time, beautiful web dashboard for your Zoho CRM Leads — with KPIs, char
 - 📈 **5 Charts** — Lead Sources (doughnut), Status (bar), Monthly Trend (line), Industry & Country breakdown
 - 🔍 **Smart Table** — Search, filter by status/source, sortable columns, pagination
 - ⬇️ **CSV Export** — Export filtered leads with one click
-- 🔄 **Auto Token Refresh** — Access tokens refresh automatically via refresh token
+- 🔄 **Auto Token Refresh** — Access tokens refresh automatically via the CRM integration
 
 ## Quick Start
 
-### 1. Get Zoho Credentials
+### 1. Get CRM API Credentials
 
 1. Go to [https://api-console.zoho.in/](https://api-console.zoho.in/)
 2. Click **"Get Started"** → **Server-based Applications**
@@ -53,18 +56,19 @@ Open [http://localhost:3000](http://localhost:3000) 🚀
 | Endpoint | Description |
 |---|---|
 | `GET /api/stats` | Aggregated dashboard stats |
-| `GET /api/leads` | All leads (paginated from Zoho) |
+| `GET /api/leads` | All leads (paginated from CRM) |
 | `GET /api/leads/search?q=&status=&source=&page=&limit=` | Filtered search |
 
 ## Project Structure
 
 ```
-zoho-lead-dashboard/
+crm-lead-dashboard/
 ├── server.js            # Express API server
 ├── zoho-auth.js         # OAuth2 token manager
 ├── get-refresh-token.js # One-time auth helper
 ├── .env                 # Your credentials (never commit!)
 ├── package.json
 └── public/
-    └── index.html       # Dashboard UI
+    ├── index.html       # Dashboard UI
+    └── screenshots/     # Screenshots of the CRM dashboard
 ```
