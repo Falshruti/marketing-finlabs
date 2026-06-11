@@ -1,5 +1,5 @@
 import React from 'react';
-import { MessageCircle, Mail } from 'lucide-react';
+import { MessageCircle, Mail, Video } from 'lucide-react';
 
 export default function Tabs({ activeTab, setActiveTab }) {
   return (
@@ -18,6 +18,14 @@ export default function Tabs({ activeTab, setActiveTab }) {
         <Mail size={20} className="tab-icon" />
         <span>Email Templates</span>
       </button>
+      <button 
+        className={`tab-btn ${activeTab === 'videos' ? 'active' : ''}`}
+        onClick={() => setActiveTab('videos')}
+      >
+        <Video size={20} className="tab-icon" />
+        <span>Videos</span>
+      </button>
     </div>
   );
 }
+
