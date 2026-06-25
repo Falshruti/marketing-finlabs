@@ -3,6 +3,7 @@ import Header from './components/Header'
 import Tabs from './components/Tabs'
 import CreativeCard from './components/CreativeCard'
 import VideoCard from './components/VideoCard'
+import AdminDashboard from './components/AdminDashboard'
 import { whatsappCreatives, emailTemplates, videos } from './data/mockData'
 import { Calendar, RotateCcw } from 'lucide-react'
 import './index.css'
@@ -14,6 +15,7 @@ function App() {
   const [categoryFilter, setCategoryFilter] = useState('All')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
+  const [showAdmin, setShowAdmin] = useState(false)
 
   const handleTabChange = (tab) => {
     setActiveTab(tab)
@@ -75,7 +77,8 @@ function App() {
 
   return (
     <>
-      <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery} onAdminClick={() => setShowAdmin(true)} />
+      {showAdmin && <AdminDashboard onClose={() => setShowAdmin(false)} />}
       <main className="main-content">
         <Tabs activeTab={activeTab} setActiveTab={handleTabChange} />
 

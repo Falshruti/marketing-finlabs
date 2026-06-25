@@ -161,12 +161,12 @@ export const whatsappCreatives = [
   },
   {
     id: 'wa-21',
-    title: 'Are You Using Finexa’s Digital Transaction Facility Yet?',
-    file: '/Are You Using Finexa’s Digital.docx',
+    title: "Are You Using Finexa's Digital Transaction Facility Yet?",
+    file: "/Are You Using Finexa\u2019s Digital.docx",
     category: 'Finexa Feature',
     date: '2026-06-11',
     topic: 'Finexa Feature'
-  }
+  },
 ];
 
 export const emailTemplates = [
@@ -178,7 +178,7 @@ export const emailTemplates = [
     category: 'Finexa Feature',
     date: '2026-06-02',
     topic: 'Exchange Integration'
-  }
+  },
 ];
 
 export const videos = [
@@ -199,5 +199,23 @@ export const videos = [
     category: 'Testimonial',
     date: '2026-06-10',
     topic: 'Product Overview'
-  }
+  },
+  {
+    id: 'vid-1782390971072',
+    title: 'Finexa Promo Video (1:min)(OLD UI Screen)',
+    category: 'Finexa Feature',
+    date: '2026-06-25',
+    topic: 'Finexa Promo Video',
+    videoUrl: 'https://youtu.be/A7geVd1vAqU',
+    thumbnail: ''
+  },
+  {
+    "id": "vid-1782391884647",
+    "title": "Finexa Demo Video",
+    "category": "Finexa Feature",
+    "date": "2026-06-25",
+    "topic": "Finexa Demo Video",
+    "videoUrl": "https://www.youtube.com/watch?v=Qdb3WaE0AEE",
+    "thumbnail": ""
+  },
 ];
