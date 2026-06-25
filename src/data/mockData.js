@@ -227,4 +227,13 @@ export const videos = [
     "videoUrl": "https://youtu.be/fq4rAJbiEJU",
     "thumbnail": ""
   },
+  {
+    "id": "vid-1782394010719",
+    "title": "DIY Client onboarding Nova video",
+    "category": "Finexa Feature",
+    "date": "2026-06-25",
+    "topic": "DIY Client onboarding Nova video",
+    "videoUrl": "https://youtu.be/QxFnRIKqcyU",
+    "thumbnail": ""
+  },
 ];

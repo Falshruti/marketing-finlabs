@@ -25,7 +25,9 @@ function Toast({ message, type, onClose }) {
 }
 
 export default function AdminDashboard({ onClose, onDataChange }) {
-  const [authed, setAuthed] = useState(false);
+  const [authed, setAuthed] = useState(() => {
+    return localStorage.getItem('admin_authed') === 'true';
+  });
   const [pwInput, setPwInput] = useState('');
   const [pwError, setPwError] = useState('');
 
@@ -73,6 +75,7 @@ export default function AdminDashboard({ onClose, onDataChange }) {
     e.preventDefault();
     if (pwInput === ADMIN_PASSWORD) {
       setAuthed(true);
+      localStorage.setItem('admin_authed', 'true');
       setPwError('');
     } else {
       setPwError('Incorrect password. Try again.');
@@ -160,6 +163,11 @@ export default function AdminDashboard({ onClose, onDataChange }) {
       setSelectedFile(null);
       setFilePreview(null);
       fetchEntries();
+      
+      // Auto-close modal after 1.2s so they can see the success toast message
+      setTimeout(() => {
+        onClose();
+      }, 1200);
     } catch (err) {
       addToast(err.message || 'Something went wrong.', 'error');
     } finally {
@@ -236,7 +244,30 @@ export default function AdminDashboard({ onClose, onDataChange }) {
             <h2 className="admin-panel-title">Admin Dashboard</h2>
             <p className="admin-panel-subtitle">Upload and manage content</p>
           </div>
-          <button className="modal-close admin-close-btn" onClick={onClose}><X size={22} /></button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+            <button
+              onClick={() => {
+                setAuthed(false);
+                localStorage.removeItem('admin_authed');
+              }}
+              style={{
+                background: 'rgba(239, 68, 68, 0.1)',
+                color: '#ef4444',
+                border: 'none',
+                padding: '0.4rem 0.8rem',
+                borderRadius: '6px',
+                fontSize: '0.8rem',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
+            >
+              Logout
+            </button>
+            <button className="modal-close admin-close-btn" style={{ position: 'static' }} onClick={onClose}><X size={22} /></button>
+          </div>
         </div>
 
         {/* Tab selector */}
