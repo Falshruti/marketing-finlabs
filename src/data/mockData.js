@@ -218,4 +218,13 @@ export const videos = [
     "videoUrl": "https://www.youtube.com/watch?v=Qdb3WaE0AEE",
     "thumbnail": ""
   },
+  {
+    "id": "vid-1782393299760",
+    "title": "Finexa Nova Promo video",
+    "category": "Finexa Feature",
+    "date": "2026-06-25",
+    "topic": "Finexa Nova Promo video",
+    "videoUrl": "https://youtu.be/fq4rAJbiEJU",
+    "thumbnail": ""
+  },
 ];

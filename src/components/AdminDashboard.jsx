@@ -24,7 +24,7 @@ function Toast({ message, type, onClose }) {
   );
 }
 
-export default function AdminDashboard({ onClose }) {
+export default function AdminDashboard({ onClose, onDataChange }) {
   const [authed, setAuthed] = useState(false);
   const [pwInput, setPwInput] = useState('');
   const [pwError, setPwError] = useState('');
@@ -57,6 +57,7 @@ export default function AdminDashboard({ onClose }) {
       const res = await fetch(`${API}/api/entries`);
       const data = await res.json();
       setEntries(data);
+      if (onDataChange) onDataChange();
     } catch {
       addToast('Could not connect to upload server. Make sure it is running.', 'error');
     } finally {

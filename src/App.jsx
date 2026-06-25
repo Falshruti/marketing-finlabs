@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Header from './components/Header'
 import Tabs from './components/Tabs'
 import CreativeCard from './components/CreativeCard'
 import VideoCard from './components/VideoCard'
 import AdminDashboard from './components/AdminDashboard'
-import { whatsappCreatives, emailTemplates, videos } from './data/mockData'
+import { whatsappCreatives as initialWhatsapp, emailTemplates as initialEmail, videos as initialVideos } from './data/mockData'
 import { Calendar, RotateCcw } from 'lucide-react'
 import './index.css'
 
@@ -16,6 +16,29 @@ function App() {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const [showAdmin, setShowAdmin] = useState(false)
+  const [entries, setEntries] = useState({
+    whatsapp: initialWhatsapp,
+    email: initialEmail,
+    videos: initialVideos
+  })
+
+  const fetchEntries = async () => {
+    try {
+      const res = await fetch('http://localhost:3001/api/entries')
+      const data = await res.json()
+      setEntries({
+        whatsapp: data.whatsappCreatives || [],
+        email: data.emailTemplates || [],
+        videos: data.videos || []
+      })
+    } catch (err) {
+      console.log('Using static mockData fallback:', err)
+    }
+  }
+
+  useEffect(() => {
+    fetchEntries()
+  }, [])
 
   const handleTabChange = (tab) => {
     setActiveTab(tab)
@@ -24,7 +47,7 @@ function App() {
     setEndDate('')
   }
 
-  const currentData = activeTab === 'whatsapp' ? whatsappCreatives : activeTab === 'email' ? emailTemplates : videos
+  const currentData = activeTab === 'whatsapp' ? entries.whatsapp : activeTab === 'email' ? entries.email : entries.videos
 
   // Specific categories requested
   const categoriesList = ['All', 'Finexa Feature', 'Festival', 'News', 'Trainings', 'Creatives', 'Testimonial']
@@ -78,7 +101,7 @@ function App() {
   return (
     <>
       <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery} onAdminClick={() => setShowAdmin(true)} />
-      {showAdmin && <AdminDashboard onClose={() => setShowAdmin(false)} />}
+      {showAdmin && <AdminDashboard onClose={() => setShowAdmin(false)} onDataChange={fetchEntries} />}
       <main className="main-content">
         <Tabs activeTab={activeTab} setActiveTab={handleTabChange} />
 

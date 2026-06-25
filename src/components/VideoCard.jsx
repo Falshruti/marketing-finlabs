@@ -4,6 +4,17 @@ import { Play, X, ExternalLink } from 'lucide-react';
 export default function VideoCard({ item }) {
   const [showModal, setShowModal] = useState(false);
 
+  // Helper to extract YouTube 11-char Video ID
+  const getYoutubeId = (url) => {
+    if (!url) return '';
+    const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
+    return match ? match[1] : '';
+  };
+
+  const videoId = getYoutubeId(item.videoUrl);
+  const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : item.videoUrl;
+  const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : item.thumbnail;
+
   return (
     <>
       <div className="creative-card animate-fade-in">
@@ -12,10 +23,12 @@ export default function VideoCard({ item }) {
           <div
             className="video-thumbnail"
             style={{
-              backgroundImage: item.thumbnail ? `url(${item.thumbnail})` : 'none',
+              backgroundImage: thumbnailUrl ? `url(${thumbnailUrl})` : 'none',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
             }}
           >
-            {!item.thumbnail && (
+            {!thumbnailUrl && (
               <div className="video-placeholder-icon">
                 <Play size={48} />
               </div>
@@ -38,7 +51,7 @@ export default function VideoCard({ item }) {
                   title="Open in YouTube"
                   onClick={() =>
                     window.open(
-                      item.videoUrl.replace('/embed/', '/watch?v='),
+                      item.videoUrl,
                       '_blank'
                     )
                   }
@@ -72,7 +85,7 @@ export default function VideoCard({ item }) {
             <h2 className="modal-title">{item.title}</h2>
             <div className="video-iframe-wrapper">
               <iframe
-                src={`${item.videoUrl}?autoplay=1`}
+                src={`${embedUrl}?autoplay=1`}
                 title={item.title}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
